@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create a Listing - Renzo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    <style>
+        /* CSS variables for dark theme */
+        :root {
+            --primary-brand: #C28760; /* A warm, earthy brown */
+            --secondary-accent: #337A4B; /* A lush, jungle green */
+            --background-dark: #121212; /* Deep background */
+            --background-surface: #1E1E1E; /* Lighter surface for cards/forms */
+            --text-light: #E0E0E0; /* Main text color */
+            --text-secondary: #B0B0B0; /* Secondary text color */
+            --border-color: #383838; /* Subtle border color */
+            --shadow-color: rgba(0, 0, 0, 0.4);
+            --toggle-bg: #444;
+            --toggle-thumb: #999;
+            --toggle-bg-active: var(--secondary-accent);
+            --toggle-thumb-active: #fff;
+        }
+
+        /* CSS variables for light theme */
+        .light-theme {
+            --primary-brand: #A56A49;
+            --secondary-accent: #226539;
+            --background-dark: #F5F5F5;
+            --background-surface: #FFFFFF;
+            --text-light: #333333;
+            --text-secondary: #666666;
+            --border-color: #DEDEDE;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --toggle-bg: #ccc;
+            --toggle-thumb: #f5f5f5;
+            --toggle-bg-active: var(--secondary-accent);
+            --toggle-thumb-active: #fff;
+        }
+
+        /* General Body and Typography */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-dark);
+            color: var(--text-light);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            position: relative; /* Needed for pseudo-element positioning */
+        }
+        
+        /* Translucent background image */
+        body::before {
+            content: '';
+            position: fixed; /* Fixed to the viewport */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('k.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.1; /* Adjust opacity for desired translucency */
+            z-index: -1; /* Place it behind all other content */
+        }
+
+        .light-theme::before {
+             opacity: 0.2; /* Updated opacity for light theme */
+        }
+        
+        /* Ensure all content on top has a solid background to remain readable */
+        .header, .hero, .ad-form-container {
+            position: relative;
+            z-index: 1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header and Navigation */
+        .header {
+            background-color: var(--background-dark);
+            box-shadow: 0 2px 10px var(--shadow-color);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .light-theme .header {
+            box-shadow: 0 2px 10px var(--shadow-color);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-brand);
+            text-decoration: none;
+        }
+
+        .header-nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .header-nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .header-nav a.active {
+            color: var(--primary-brand);
+        }
+
+        .header-nav a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--primary-brand);
+            transition: width 0.3s ease;
+        }
+
+        .header-nav a.active::after,
+        .header-nav a:hover::after {
+            width: 100%;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            font-size: 1.5rem;
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+        }
+        
+        .mobile-controls {
+            display: none;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        /* --- New Theme Toggle Styles --- */
+        .theme-toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .theme-toggle {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        .theme-toggle input {
+            display: none;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--toggle-bg);
+            border-radius: 34px;
+            transition: background-color 0.3s;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .toggle-slider:before {
+            content: "";
+            position: absolute;
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: var(--toggle-thumb);
+            border-radius: 50%;
+            transition: transform 0.3s, background-color 0.3s;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: var(--toggle-bg-active);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+            background-color: var(--toggle-thumb-active);
+        }
+
+        .theme-toggle-icon {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            transition: color 0.3s;
+        }
+        
+        .theme-toggle-container.light .theme-toggle-icon.fa-sun,
+        .theme-toggle-container.dark .theme-toggle-icon.fa-moon {
+            color: var(--primary-brand);
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 50px 0;
+            background: var(--background-surface);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            color: var(--text-light);
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .hero p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 0;
+        }
+        
+        .light-theme .hero {
+            box-shadow: 0 4px 10px var(--shadow-color);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 40px 0;
+        }
+
+        .ad-form-container {
+            background: var(--background-surface);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px var(--shadow-color);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .light-theme .ad-form-container {
+             box-shadow: 0 4px 20px var(--shadow-color);
+        }
+
+        .form-header h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--text-light);
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+        .form-header p {
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative; /* For error messages */
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-light);
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--background-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-light);
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--primary-brand);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(194, 135, 96, 0.5);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        .form-group .radio-group {
+            display: flex;
+            flex-direction: row; /* Ensure radio buttons are in a row */
+            gap: 20px;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .radio-group input[type="radio"] {
+            display: none;
+        }
+
+        .radio-label {
+            padding: 10px 20px;
+            background-color: var(--background-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            flex-grow: 1; /* Allow labels to grow on mobile */
+            text-align: center;
+        }
+
+        .radio-group input[type="radio"]:checked + .radio-label {
+            background-color: var(--primary-brand);
+            color: var(--background-dark);
+            border-color: var(--primary-brand);
+        }
+
+        .image-upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+
+        .image-upload-area:hover {
+            border-color: var(--secondary-accent);
+        }
+
+        .image-upload-area.dragover {
+            background-color: var(--background-dark);
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .upload-text {
+            color: var(--text-secondary);
+            margin-top: 10px;
+        }
+
+        #image-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .image-preview-item {
+            position: relative;
+            width: 100%;
+            height: 100px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .image-preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .remove-image-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .image-preview-item:hover .remove-image-btn {
+            opacity: 1;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .form-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .submit-btn {
+            background-color: var(--secondary-accent);
+            color: white;
+        }
+
+        .submit-btn:hover {
+            background-color: #27623a;
+            transform: translateY(-2px);
+        }
+
+        .reset-btn {
+            background-color: var(--background-dark);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+        
+        .light-theme .reset-btn {
+            background-color: var(--background-surface);
+        }
+
+        .reset-btn:hover {
+            background-color: #2a2a2a;
+            transform: translateY(-2px);
+        }
+        
+        .light-theme .reset-btn:hover {
+            background-color: #f0f0f0;
+        }
+
+        /* Success Message and Dynamic Sections */
+        #successMessage {
+            text-align: center;
+            padding: 50px 20px;
+            background: var(--background-surface);
+            border-radius: 15px;
+            display: none;
+        }
+
+        #successMessage .success-icon {
+            color: var(--secondary-accent);
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        #successMessage h3 {
+            font-size: 2rem;
+            color: var(--text-light);
+        }
+
+        #successMessage p {
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+        }
+
+        .go-home-btn {
+            background-color: var(--primary-brand);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        .go-home-btn:hover {
+            background-color: #a9734e;
+        }
+
+        .form-content-wrapper,
+        #propertyFields,
+        #carFields {
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out, opacity 0.5s ease;
+        }
+
+        .form-content-wrapper.visible,
+        #propertyFields.visible,
+        #carFields.visible {
+            opacity: 1;
+            max-height: 2000px; /* A large enough value to allow smooth expansion */
+            padding-top: 20px;
+        }
+
+        /* Draft Suggestion Banner */
+        #draftSuggestionBanner {
+            background-color: #272727;
+            color: var(--text-light);
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-20px);
+            transition: opacity 0.5s ease, transform 0.5s ease, visibility 0.5s ease;
+        }
+        
+        .light-theme #draftSuggestionBanner {
+            background-color: #f0f0f0;
+        }
+
+        #draftSuggestionBanner.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .draft-message {
+            font-weight: 500;
+        }
+
+        .draft-actions button {
+            background: none;
+            border: none;
+            color: var(--primary-brand);
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: background-color 0.2s ease;
+        }
+
+        .draft-actions button:hover {
+            background-color: rgba(194, 135, 96, 0.1);
+        }
+        
+        /* New Styles for UX improvements */
+        
+        /* Mobile Menu Styles */
+        @media (max-width: 768px) {
+            .header-nav {
+                display: none;
+                position: absolute;
+                top: 60px;
+                right: 0;
+                width: 100%;
+                background-color: var(--background-dark);
+                box-shadow: 0 4px 10px var(--shadow-color);
+                flex-direction: column;
+                text-align: center;
+                padding: 20px 0;
+                transition: transform 0.3s ease;
+                transform: translateY(-100%);
+            }
+            
+            .header-nav.active {
+                display: flex;
+                transform: translateY(0);
+            }
+            
+            .header-nav ul {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .header-nav a {
+                padding: 10px;
+                display: block;
+                font-size: 1.2rem;
+            }
+
+            .mobile-controls {
+                display: flex;
+            }
+            .header .header-nav {
+                display: none;
+            }
+            .hero {
+                padding: 30px 0;
+            }
+            .ad-form-container {
+                padding: 20px;
+            }
+
+            /* Adjust hero text for smaller screens */
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+            
+            /* Smaller button for draft restore on mobile/tablet */
+            #draftSuggestionBanner .draft-actions button {
+                padding: 5px 10px;
+                font-size: 0.9rem;
+            }
+        }
+        
+        /* --- New Media Query for smaller phones --- */
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 15px;
+            }
+
+            .ad-form-container {
+                padding: 15px;
+            }
+
+            .form-header h2 {
+                font-size: 1.5rem;
+            }
+
+            .form-actions {
+                flex-direction: column-reverse;
+                gap: 10px;
+            }
+
+            .form-btn {
+                width: 100%;
+                text-align: center;
+            }
+
+            .radio-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .form-group .radio-group {
+                flex-direction: column;
+            }
+
+            .draft-suggestion-banner {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+
+        /* Validation and Error Messages */
+        .error-message {
+            color: #ff6b6b;
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        input.invalid,
+        select.invalid,
+        textarea.invalid {
+            border-color: #ff6b6b;
+        }
+        
+        /* Image Upload Error */
+        #image-upload-error {
+            color: #ff6b6b;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            display: none;
+            text-align: center;
+        }
+        
+        /* Draft Restored Message */
+        #draftRestoredMessage {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background-color: var(--secondary-accent);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 2000;
+            opacity: 0;
+            transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+        }
+        
+        #draftRestoredMessage.visible {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        
+        /* Confirmation Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0.3s, opacity 0.3s;
+        }
+        
+        .modal-overlay.visible {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .modal-content {
+            background-color: var(--background-surface);
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            transform: scale(0.9);
+            transition: transform 0.3s ease-out;
+        }
+        
+        .modal-overlay.visible .modal-content {
+            transform: scale(1);
+        }
+        
+        .modal-content h3 {
+            margin-top: 0;
+            color: var(--text-light);
+        }
+        
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        /* Dynamic success message styling */
+        .success-details {
+            margin-top: 20px;
+            background-color: var(--background-dark);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: left;
+        }
+        
+        .light-theme .success-details {
+            background-color: #f8f8f8;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="container header-content">
+            <a href="index.html" class="logo">Renzo</a>
+            <nav class="header-nav">
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Listings</a></li>
+                    <li><a href="#" class="active">Create Ad</a></li>
+                    <li>
+                        <div class="theme-toggle-container desktop-toggle">
+                            <i class="fas fa-moon theme-toggle-icon"></i>
+                            <label class="theme-toggle">
+                                <input type="checkbox" id="theme-toggle-desktop">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <i class="fas fa-sun theme-toggle-icon"></i>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+            <div class="mobile-controls">
+                <div class="theme-toggle-container mobile-toggle">
+                    <i class="fas fa-moon theme-toggle-icon"></i>
+                    <label class="theme-toggle">
+                        <input type="checkbox" id="theme-toggle-mobile">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <i class="fas fa-sun theme-toggle-icon"></i>
+                </div>
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="hero">
+        <div class="container">
+            <h1>Create a New Listing</h1>
+            <p>Fill out the form below to post your item for rent.</p>
+        </div>
+    </div>
+
+    <main class="main-content">
+        <div class="container">
+
+            <!-- Success Message -->
+            <div id="successMessage">
+                <i class="fas fa-check-circle success-icon"></i>
+                <h3>Your listing has been submitted!</h3>
+                <p>We'll review your submission and it will be live shortly.</p>
+                
+                <div class="success-details">
+                    <p><strong>Title:</strong> <span id="adTitleDisplay"></span></p>
+                    <p><strong>Type:</strong> <span id="adTypeDisplay"></span></p>
+                    <p><strong>Price:</strong> <span id="adPriceDisplay"></span></p>
+                </div>
+                
+                <a href="#" class="go-home-btn" onclick="resetForm()">Go back to Home</a>
+            </div>
+
+            <!-- Ad Form Container -->
+            <div id="adFormContainer" class="ad-form-container">
+                <div class="form-header">
+                    <h2>Listing Details</h2>
+                    <p>Start by selecting the category of your listing.</p>
+                </div>
+
+                <!-- Draft Suggestion Banner -->
+                <div id="draftSuggestionBanner">
+                    <span class="draft-message">It looks like you have a draft listing. Would you like to restore it?</span>
+                    <div class="draft-actions">
+                        <button id="restoreDraftBtn">Restore Draft</button>
+                        <button id="discardDraftBtn">Discard</button>
+                    </div>
+                </div>
+                
+                <form id="adForm">
+                    <div class="form-group">
+                        <label>Listing Type</label>
+                        <div class="radio-group">
+                            <input type="radio" id="typeProperty" name="listingType" value="property">
+                            <label for="typeProperty" class="radio-label"><i class="fas fa-building"></i> Property</label>
+
+                            <input type="radio" id="typeCar" name="listingType" value="car">
+                            <label for="typeCar" class="radio-label"><i class="fas fa-car"></i> Vehicle</label>
+                        </div>
+                    </div>
+
+                    <div id="formContentWrapper" class="form-content-wrapper">
+                        <div class="form-group">
+                            <label for="adTitle">Title <span class="required">*</span></label>
+                            <input type="text" id="adTitle" name="adTitle" required>
+                            <span class="error-message" id="adTitle-error"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="adDescription">Description <span class="required">*</span></label>
+                            <textarea id="adDescription" name="adDescription" required></textarea>
+                            <span class="error-message" id="adDescription-error"></span>
+                        </div>
+                        
+                        <!-- New Price and Duration Fields -->
+                        <div class="form-group">
+                            <label for="adPrice">Price <span class="required">*</span></label>
+                            <input type="number" id="adPrice" name="adPrice" required>
+                            <span class="error-message" id="adPrice-error"></span>
+                        </div>
+                        <div class="form-group">
+                            <label>Price Duration <span class="required">*</span></label>
+                            <div class="radio-group" id="priceDurationRadioGroup">
+                                <input type="radio" id="pricePerDay" name="pricePer" value="day">
+                                <label for="pricePerDay" class="radio-label">Per Day</label>
+                                <input type="radio" id="pricePerMonth" name="pricePer" value="month" checked>
+                                <label for="pricePerMonth" class="radio-label">Per Month</label>
+                            </div>
+                        </div>
+
+
+                        <!-- Dynamic Fields for Property -->
+                        <div id="propertyFields">
+                            <div class="form-group">
+                                <label for="propertyCategory">Property Type <span class="required">*</span></label>
+                                <select id="propertyCategory" name="propertyCategory" required>
+                                    <option value="" disabled selected>Select a category</option>
+                                    <option value="house">House</option>
+                                    <option value="apartment">Apartment</option>
+                                    <option value="land">Land</option>
+                                    <option value="commercial">Commercial</option>
+                                </select>
+                                <span class="error-message" id="propertyCategory-error"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="bedrooms">Bedrooms</label>
+                                <input type="number" id="bedrooms" name="bedrooms" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label for="bathrooms">Bathrooms</label>
+                                <input type="number" id="bathrooms" name="bathrooms" min="0">
+                            </div>
+                        </div>
+
+                        <!-- Dynamic Fields for Car -->
+                        <div id="carFields">
+                            <div class="form-group">
+                                <label for="carType">Vehicle Type <span class="required">*</span></label>
+                                <select id="carType" name="carType" required>
+                                    <option value="" disabled selected>Select a vehicle type</option>
+                                    <option value="sedan">Sedan</option>
+                                    <option value="suv">SUV</option>
+                                    <option value="truck">Truck</option>
+                                    <option value="motorcycle">Motorcycle</option>
+                                </select>
+                                <span class="error-message" id="carType-error"></span>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="carBrand">Brand <span class="required">*</span></label>
+                                <input type="text" id="carBrand" name="carBrand" required>
+                                <span class="error-message" id="carBrand-error"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="carModel">Model <span class="required">*</span></label>
+                                <input type="text" id="carModel" name="carModel" required>
+                                <span class="error-message" id="carModel-error"></span>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="carYear">Year</label>
+                                <input type="number" id="carYear" name="carYear" min="1900" max="2100">
+                                <span class="error-message" id="carYear-error"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="engineCc">Engine CC</label>
+                                <input type="number" id="engineCc" name="engineCc" min="0">
+                                <span class="error-message" id="engineCc-error"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Transmission</label>
+                                <div class="radio-group">
+                                    <input type="radio" id="transAutomatic" name="transmission" value="automatic">
+                                    <label for="transAutomatic" class="radio-label">Automatic</label>
+                                    <input type="radio" id="transManual" name="transmission" value="manual">
+                                    <label for="transManual" class="radio-label">Manual</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="adLocation">Location</label>
+                            <input type="text" id="adLocation" name="adLocation">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Images <span class="required">*</span></label>
+                            <div class="image-upload-area" id="image-upload-area">
+                                <input type="file" id="file-input" multiple accept="image/*">
+                                <label for="file-input" class="file-input-label">
+                                    <i class="fas fa-upload upload-icon"></i>
+                                    <div class="upload-text">Drag and drop images here, or click to browse</div>
+                                </label>
+                            </div>
+                            <span class="error-message" id="image-upload-error">Please upload at least one image.</span>
+                            <div id="image-preview"></div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="form-btn reset-btn" id="resetBtn">Reset</button>
+                            <button type="submit" class="form-btn submit-btn" id="submitBtn">Submit Listing</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Draft Restored Message -->
+    <div id="draftRestoredMessage">Draft restored!</div>
+    
+    <!-- Reset Confirmation Modal -->
+    <div class="modal-overlay" id="resetModal">
+        <div class="modal-content">
+            <h3>Are you sure?</h3>
+            <p>This will clear all the data in the form. You will not be able to recover it.</p>
+            <div class="modal-buttons">
+                <button class="form-btn reset-btn" id="confirmResetBtn">Yes, Reset</button>
+                <button class="form-btn submit-btn" id="cancelResetBtn">No, Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // DOM Elements
+        const adForm = document.getElementById('adForm');
+        const listingTypeRadios = document.querySelectorAll('input[name="listingType"]');
+        const formContentWrapper = document.getElementById('formContentWrapper');
+        const propertyFields = document.getElementById('propertyFields');
+        const carFields = document.getElementById('carFields');
+        const fileInput = document.getElementById('file-input');
+        const imagePreview = document.getElementById('image-preview');
+        const imageUploadArea = document.getElementById('image-upload-area');
+        const draftSuggestionBanner = document.getElementById('draftSuggestionBanner');
+        const restoreDraftBtn = document.getElementById('restoreDraftBtn');
+        const discardDraftBtn = document.getElementById('discardDraftBtn');
+        const adFormContainer = document.getElementById('adFormContainer');
+        const successMessage = document.getElementById('successMessage');
+        const resetBtn = document.getElementById('resetBtn');
+        const resetModal = document.getElementById('resetModal');
+        const confirmResetBtn = document.getElementById('confirmResetBtn');
+        const cancelResetBtn = document.getElementById('cancelResetBtn');
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const headerNav = document.querySelector('.header-nav');
+        const draftRestoredMessage = document.getElementById('draftRestoredMessage');
+        const imageUploadError = document.getElementById('image-upload-error');
+        const goHomeBtn = document.querySelector('.go-home-btn');
+        const pricePerRadios = document.querySelectorAll('input[name="pricePer"]');
+        
+        // New theme toggle elements
+        const themeToggleDesktop = document.getElementById('theme-toggle-desktop');
+        const themeToggleMobile = document.getElementById('theme-toggle-mobile');
+        const desktopToggleContainer = document.querySelector('.theme-toggle-container.desktop-toggle');
+        const mobileToggleContainer = document.querySelector('.theme-toggle-container.mobile-toggle');
+        
+        let uploadedFiles = [];
+
+        // Function to toggle the required attribute on inputs
+        function toggleRequiredAttributes(fields, isRequired) {
+            const inputs = fields.querySelectorAll('input, select, textarea');
+            inputs.forEach(input => {
+                if (isRequired) {
+                    input.setAttribute('required', 'required');
+                } else {
+                    input.removeAttribute('required');
+                    // Also clear validation state when fields are hidden
+                    input.classList.remove('invalid');
+                    const errorSpan = document.getElementById(`${input.id}-error`);
+                    if (errorSpan) errorSpan.style.display = 'none';
+                }
+            });
+        }
+        
+        // --- UX Feature 1: Mobile Navigation ---
+        mobileMenuBtn.addEventListener('click', () => {
+            headerNav.classList.toggle('active');
+        });
+
+        // Function to show/hide sections based on radio button selection
+        function toggleFormSections() {
+            const selectedType = document.querySelector('input[name="listingType"]:checked');
+            
+            formContentWrapper.classList.remove('visible');
+            propertyFields.classList.remove('visible');
+            carFields.classList.remove('visible');
+            toggleRequiredAttributes(propertyFields, false);
+            toggleRequiredAttributes(carFields, false);
+            
+            if (selectedType) {
+                setTimeout(() => {
+                    formContentWrapper.classList.add('visible');
+                    if (selectedType.value === 'property') {
+                        propertyFields.classList.add('visible');
+                        toggleRequiredAttributes(propertyFields, true);
+                    } else if (selectedType.value === 'car') {
+                        carFields.classList.add('visible');
+                        toggleRequiredAttributes(carFields, true);
+                    }
+                }, 50); // Small delay for smooth transition
+            }
+        }
+        
+        // --- UX Feature 2: Real-time Form Validation and Feedback ---
+        // Function to validate a single field
+        function validateField(input) {
+            const errorSpan = document.getElementById(`${input.id}-error`);
+            if (!input.checkValidity()) {
+                input.classList.add('invalid');
+                if (errorSpan) {
+                    errorSpan.textContent = input.validationMessage || "This field is required.";
+                    errorSpan.style.display = 'block';
+                }
+            } else {
+                input.classList.remove('invalid');
+                if (errorSpan) {
+                    errorSpan.style.display = 'none';
+                }
+            }
+        }
+        
+        // Add event listeners for real-time validation
+        const formInputs = adForm.querySelectorAll('input, select, textarea');
+        formInputs.forEach(input => {
+            input.addEventListener('blur', () => validateField(input));
+        });
+
+        // Function to update image preview
+        function updateImagePreview() {
+            imagePreview.innerHTML = ''; // Clear existing previews
+            if (uploadedFiles.length > 0) {
+                imageUploadError.style.display = 'none';
+            }
+            uploadedFiles.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const imgContainer = document.createElement('div');
+                    imgContainer.classList.add('image-preview-item');
+                    
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.alt = `Uploaded image ${index + 1}`;
+                    imgContainer.appendChild(img);
+                    
+                    const removeBtn = document.createElement('button');
+                    removeBtn.classList.add('remove-image-btn');
+                    removeBtn.innerHTML = '&times;';
+                    removeBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        uploadedFiles.splice(index, 1);
+                        updateImagePreview();
+                    });
+                    imgContainer.appendChild(removeBtn);
+
+                    imagePreview.appendChild(imgContainer);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+        
+        function handleFiles(files) {
+            uploadedFiles = [...uploadedFiles, ...files];
+            updateImagePreview();
+        }
+
+        // Event listeners for drag and drop
+        imageUploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            imageUploadArea.classList.add('dragover');
+        });
+
+        imageUploadArea.addEventListener('dragleave', () => {
+            imageUploadArea.classList.remove('dragover');
+        });
+
+        imageUploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            imageUploadArea.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        // Event listener for file input change
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+        
+        // --- UX Feature 3: Reset Confirmation Modal ---
+        resetBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            resetModal.classList.add('visible');
+        });
+        
+        confirmResetBtn.addEventListener('click', () => {
+            resetForm();
+            resetModal.classList.remove('visible');
+        });
+        
+        cancelResetBtn.addEventListener('click', () => {
+            resetModal.classList.remove('visible');
+        });
+
+        // Function to reset the form
+        function resetForm(e) {
+            if(e) e.preventDefault();
+            
+            adForm.reset();
+            uploadedFiles = [];
+            updateImagePreview();
+            
+            // Hide the main content wrapper and specific fields
+            formContentWrapper.classList.remove('visible');
+            propertyFields.classList.remove('visible');
+            carFields.classList.remove('visible');
+            toggleRequiredAttributes(propertyFields, false);
+            toggleRequiredAttributes(carFields, false);
+            
+            // Clear validation state
+            formInputs.forEach(input => {
+                input.classList.remove('invalid');
+                const errorSpan = document.getElementById(`${input.id}-error`);
+                if (errorSpan) errorSpan.style.display = 'none';
+            });
+            imageUploadError.style.display = 'none';
+            
+            successMessage.style.display = 'none';
+            adFormContainer.style.display = 'block';
+            draftSuggestionBanner.classList.remove('visible');
+
+            // Clear the draft from local storage on reset
+            localStorage.removeItem('draftAd');
+        }
+        
+        // --- Added event listener for "Go back to Home" button on success page
+        goHomeBtn.addEventListener('click', (e) => {
+             e.preventDefault();
+             resetForm();
+        });
+
+
+        // Function to submit the form
+        adForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Check image validation first
+            if (uploadedFiles.length === 0) {
+                imageUploadError.style.display = 'block';
+                return;
+            }
+            
+            imageUploadError.style.display = 'none';
+
+            // Gather data for success message
+            const adTitle = document.getElementById('adTitle').value;
+            const adPrice = document.getElementById('adPrice').value;
+            const adTypeElement = document.querySelector('input[name="listingType"]:checked');
+            const adType = adTypeElement ? adTypeElement.value : 'N/A';
+            const priceDurationElement = document.querySelector('input[name="pricePer"]:checked');
+            const priceDuration = priceDurationElement ? priceDurationElement.value : 'N/A';
+            
+            // Update the success message with form data
+            document.getElementById('adTitleDisplay').textContent = adTitle;
+            document.getElementById('adTypeDisplay').textContent = adType.charAt(0).toUpperCase() + adType.slice(1);
+            document.getElementById('adPriceDisplay').textContent = `$${adPrice} / ${priceDuration}`;
+
+            // Show success message and hide the form
+            adFormContainer.style.display = 'none';
+            successMessage.style.display = 'block';
+            
+            // Clear the draft after successful submission
+            localStorage.removeItem('draftAd');
+        });
+
+        // Autosave functionality
+        let saveTimer;
+        function saveFormData() {
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(() => {
+                const formData = new FormData(adForm);
+                const data = Object.fromEntries(formData.entries());
+                
+                const selectedType = document.querySelector('input[name="listingType"]:checked');
+                if (selectedType) {
+                    data.listingType = selectedType.value;
+                }
+                
+                const priceDuration = document.querySelector('input[name="pricePer"]:checked');
+                if (priceDuration) {
+                    data.pricePer = priceDuration.value;
+                }
+
+                localStorage.setItem('draftAd', JSON.stringify(data));
+                console.log('Draft saved automatically.');
+            }, 1000); // Save after 1 second of no changes
+        }
+
+        adForm.addEventListener('input', saveFormData);
+
+        // Function to restore the draft
+        function restoreDraft() {
+            const draft = localStorage.getItem('draftAd');
+            if (draft) {
+                const data = JSON.parse(draft);
+                
+                for (const key in data) {
+                    const input = adForm.elements[key];
+                    if (input) {
+                        if (input.type === 'radio') {
+                            const radioBtn = document.querySelector(`input[name="${key}"][value="${data[key]}"]`);
+                            if (radioBtn) radioBtn.checked = true;
+                        } else {
+                            input.value = data[key];
+                        }
+                    }
+                }
+                
+                const restoredType = data.listingType;
+                if (restoredType) {
+                    document.getElementById(`type${restoredType.charAt(0).toUpperCase() + restoredType.slice(1)}`).checked = true;
+                    toggleFormSections();
+                }
+
+                const restoredPricePer = data.pricePer;
+                if (restoredPricePer) {
+                    const pricePerRadio = document.querySelector(`input[name="pricePer"][value="${restoredPricePer}"]`);
+                    if (pricePerRadio) {
+                        pricePerRadio.checked = true;
+                    }
+                }
+                
+                draftSuggestionBanner.classList.remove('visible');
+                
+                draftRestoredMessage.classList.add('visible');
+                setTimeout(() => {
+                    draftRestoredMessage.classList.remove('visible');
+                }, 3000);
+            }
+        }
+        
+        // Discard draft functionality
+        discardDraftBtn.addEventListener('click', () => {
+            localStorage.removeItem('draftAd');
+            draftSuggestionBanner.classList.remove('visible');
+        });
+
+        // Event listeners for listing type radios
+        listingTypeRadios.forEach(radio => {
+            radio.addEventListener('change', toggleFormSections);
+        });
+
+        // --- Theme Toggle Logic ---
+        function setTheme(theme) {
+            const body = document.body;
+            if (theme === 'light') {
+                body.classList.add('light-theme');
+                themeToggleDesktop.checked = true;
+                themeToggleMobile.checked = true;
+                desktopToggleContainer.classList.add('light');
+                mobileToggleContainer.classList.add('light');
+            } else {
+                body.classList.remove('light-theme');
+                themeToggleDesktop.checked = false;
+                themeToggleMobile.checked = false;
+                desktopToggleContainer.classList.remove('light');
+                mobileToggleContainer.classList.remove('light');
+            }
+            localStorage.setItem('theme', theme);
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.body.classList.contains('light-theme') ? 'light' : 'dark';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            setTheme(newTheme);
+        }
+        
+        themeToggleDesktop.addEventListener('change', toggleTheme);
+        themeToggleMobile.addEventListener('change', toggleTheme);
+        
+        // On page load, check for a draft and set theme
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                setTheme(savedTheme);
+            } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+                setTheme('light');
+            } else {
+                setTheme('dark');
+            }
+            
+            const draft = localStorage.getItem('draftAd');
+            if (draft) {
+                draftSuggestionBanner.classList.add('visible');
+            }
+            
+            // Event listener for restoring the draft
+            restoreDraftBtn.addEventListener('click', restoreDraft);
+        });
+    </script>
+</body>
+</html>

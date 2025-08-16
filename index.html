@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Renzo - Sri Lanka's Premium Rentals</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* A new, professional color palette inspired by Sri Lanka */
+        :root {
+            --primary-brand: #C28760; /* A warm, earthy brown */
+            --secondary-accent: #337A4B; /* A lush, jungle green */
+            --background-dark: #121212; /* Deep background */
+            --background-surface: #1E1E1E; /* Lighter surface for cards */
+            --text-light: #E0E0E0; /* Main text color */
+            --text-secondary: #B0B0B0; /* Secondary text color */
+            --border-color: #383838; /* Subtle border color */
+            --card-shadow: rgba(0, 0, 0, 0.4);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background-color: var(--background-dark);
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        /*
+            New animations for a professional, dynamic feel.
+            These will be applied via JavaScript using IntersectionObserver.
+        */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+
+        .fade-in.appear {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @keyframes heroTextSlideIn {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes heroSearchSlideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Header/Navbar Styles --- */
+        header {
+            background-color: rgba(18, 18, 18, 0.9);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--primary-brand);
+            box-shadow: 0 2px 10px var(--card-shadow);
+            backdrop-filter: blur(8px);
+        }
+        
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--secondary-accent);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+        
+        .logo i {
+            color: var(--primary-brand);
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-light);
+            font-weight: 500;
+            position: relative;
+            padding: 0.5rem 0;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary-brand);
+            transition: width 0.3s ease-in-out;
+        }
+        
+        .nav-links a:hover {
+            color: var(--text-light);
+        }
+        
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            width: 100%;
+        }
+        
+        .user-profile {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--secondary-accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            overflow: hidden;
+        }
+        
+        .user-profile:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 0 2px var(--primary-brand);
+        }
+        
+        .user-profile i {
+            color: var(--background-dark);
+            font-size: 1.2rem;
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-light);
+        }
+
+        /* --- Hero Section Styles --- */
+        .hero {
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
+                        url('https://images.unsplash.com/photo-1572017260020-f55a1d7f8d6f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80') center center / cover no-repeat fixed;
+            height: 90vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 0 1rem;
+            position: relative;
+        }
+        
+        .hero-content h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-light);
+            text-shadow: 2px 2px 6px rgba(0,0,0,0.8);
+            font-weight: 700;
+            animation: heroTextSlideIn 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+        
+        .hero-content p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            color: var(--text-secondary);
+            animation: heroTextSlideIn 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+            animation-delay: 0.2s;
+        }
+        
+        .search-container {
+            background-color: rgba(255, 255, 255, 0.08);
+            padding: 2rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px var(--card-shadow);
+            animation: heroSearchSlideIn 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+            animation-delay: 0.4s;
+        }
+        
+        .search-form {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .search-input, .filter-select {
+            flex: 1;
+            min-width: 200px;
+            padding: 0.85rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            background-color: var(--background-surface);
+            color: var(--text-light);
+            transition: all 0.3s ease;
+        }
+
+        .search-input::placeholder, .filter-select {
+            color: var(--text-secondary);
+        }
+
+        .search-input:focus, .filter-select:focus {
+            outline: none;
+            border-color: var(--secondary-accent);
+            box-shadow: 0 0 0 3px rgba(51, 122, 75, 0.3);
+        }
+        
+        .search-btn {
+            background-color: var(--primary-brand);
+            color: white;
+            border: none;
+            padding: 0.85rem 2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(194, 135, 96, 0.4);
+        }
+        
+        .search-btn:hover {
+            background-color: #D39F7A;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(194, 135, 96, 0.6);
+        }
+
+        /* --- Main Content and Card Styles --- */
+        .container {
+            max-width: 1400px;
+            margin: 5rem auto;
+            padding: 0 5%;
+        }
+        
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 2.5rem;
+            color: var(--secondary-accent);
+            position: relative;
+            display: inline-block;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 80px;
+            height: 4px;
+            background-color: var(--primary-brand);
+            border-radius: 2px;
+        }
+
+        .listings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2.5rem;
+            margin-bottom: 3rem;
+        }
+        
+        .listing-card {
+            background-color: var(--background-surface);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px var(--card-shadow);
+            transition: all 0.4s;
+            border: 1px solid var(--border-color);
+        }
+        
+        .listing-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6), 0 0 15px rgba(51, 122, 75, 0.3);
+            border-color: var(--secondary-accent);
+        }
+        
+        .listing-img {
+            height: 220px;
+            width: 100%;
+            object-fit: cover;
+            border-bottom: 2px solid var(--primary-brand);
+        }
+        
+        .listing-details {
+            padding: 1.5rem;
+        }
+        
+        .listing-title {
+            font-size: 1.4rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+        
+        .listing-location {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .listing-location i {
+            color: var(--primary-brand);
+        }
+
+        .listing-features {
+            display: flex;
+            gap: 1.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .listing-features span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .listing-features i {
+            color: var(--secondary-accent);
+        }
+        
+        .listing-price {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--secondary-accent);
+            margin: 1rem 0;
+            display: flex;
+            align-items: baseline;
+            gap: 0.5rem;
+        }
+        
+        .listing-price span {
+            font-size: 0.9rem;
+            font-weight: normal;
+            color: var(--text-secondary);
+        }
+        
+        .book-btn {
+            display: block;
+            width: 100%;
+            padding: 0.85rem;
+            background-color: var(--primary-brand);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+            text-align: center;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(194, 135, 96, 0.4);
+        }
+        
+        .book-btn:hover {
+            background-color: #D39F7A;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(194, 135, 96, 0.6);
+        }
+
+        /* --- Other sections and buttons --- */
+        .create-ad-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: var(--secondary-accent);
+            color: var(--background-dark);
+            border: none;
+            padding: 0.85rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 15px rgba(51, 122, 75, 0.4);
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+        
+        .create-ad-btn:hover {
+            background-color: #559971;
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(51, 122, 75, 0.6);
+        }
+
+        /* --- Filters Styles --- */
+        .filters {
+            background-color: var(--background-surface);
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 3rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 20px var(--card-shadow);
+        }
+        
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            justify-content: center;
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .filter-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--secondary-accent);
+        }
+        
+        footer {
+            background-color: var(--background-dark);
+            color: var(--text-secondary);
+            padding: 3rem 5%;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+        
+        .footer-column h3 {
+            font-size: 1.4rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-light);
+            position: relative;
+            display: inline-block;
+        }
+        
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 40px;
+            height: 2px;
+            background-color: var(--primary-brand);
+        }
+        
+        .footer-column ul {
+            list-style: none;
+        }
+        
+        .footer-column ul li {
+            margin-bottom: 0.8rem;
+        }
+        
+        .footer-column ul li a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .footer-column ul li a:hover {
+            color: var(--secondary-accent);
+        }
+        
+        .footer-column ul li a i {
+            color: var(--primary-brand);
+            width: 20px;
+            text-align: center;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .social-links a {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            transition: color 0.3s;
+        }
+        
+        .social-links a:hover {
+            color: var(--secondary-accent);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 2rem;
+            margin-top: 2rem;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+        
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 70px;
+                left: 0;
+                width: 100%;
+                background-color: rgba(18, 18, 18, 0.95);
+                flex-direction: column;
+                align-items: center;
+                padding: 1rem 0;
+                border-bottom: 1px solid var(--primary-brand);
+                box-shadow: 0 4px 10px var(--card-shadow);
+            }
+            
+            .nav-links.show {
+                display: flex;
+                animation: fadeIn 0.5s ease-out;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .search-form {
+                flex-direction: column;
+            }
+            
+            .search-input, .search-btn {
+                width: 100%;
+            }
+            
+            .filter-row {
+                flex-direction: column;
+            }
+        }
+
+        /* Auth Modal Styles */
+        .auth-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .auth-modal-content {
+            background-color: var(--background-surface);
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 4px 20px var(--card-shadow);
+        }
+
+        .auth-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .auth-modal-title {
+            font-size: 1.5rem;
+            color: var(--secondary-accent);
+        }
+
+        .close-auth-modal {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .auth-form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .auth-form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-light);
+        }
+
+        .auth-form-input {
+            width: 100%;
+            padding: 0.85rem;
+            background-color: var(--background-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-light);
+            font-size: 1rem;
+        }
+
+        .auth-form-input:focus {
+            outline: none;
+            border-color: var(--primary-brand);
+        }
+
+        .auth-form-submit {
+            width: 100%;
+            padding: 0.85rem;
+            background-color: var(--primary-brand);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+
+        .auth-form-submit:hover {
+            background-color: #D39F7A;
+        }
+
+        .auth-form-toggle {
+            text-align: center;
+            margin-top: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .auth-form-toggle span {
+            color: var(--primary-brand);
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .auth-error {
+            color: #ff6b6b;
+            margin-top: 1rem;
+            text-align: center;
+            display: none;
+        }
+
+        .google-signin-btn {
+            width: 100%;
+            padding: 0.85rem;
+            background-color: #4285F4;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .google-signin-btn:hover {
+            background-color: #357ABD;
+        }
+
+        .google-icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+            color: var(--text-secondary);
+        }
+
+        .auth-divider::before,
+        .auth-divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .auth-divider::before {
+            margin-right: 1rem;
+        }
+
+        .auth-divider::after {
+            margin-left: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <a href="main.html" class="logo">
+                <i class="fas fa-home"></i> Renzo
+            </a>
+            <div class="nav-links">
+                <a href="main.html" class="active">Home</a>
+                <a href="#all-listings">Listings</a>
+                <a href="#about">About</a>
+
+           <a href="/user-profile.html" id="userProfileLink">
+    <div class="user-profile" id="userProfile">
+        <i class="fas fa-user"></i>
+    </div>
+</a>
+
+
+
+                <button id="authButton" class="search-btn" style="padding: 0.5rem 1.5rem;">Login</button>
+            </div>
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Auth Modal -->
+    <div class="auth-modal" id="authModal">
+        <div class="auth-modal-content">
+            <div class="auth-modal-header">
+                <h3 class="auth-modal-title" id="authModalTitle">Login</h3>
+                <button class="close-auth-modal" id="closeAuthModal">&times;</button>
+            </div>
+            <form id="authForm">
+                <div class="auth-form-group">
+                    <label class="auth-form-label">Email</label>
+                    <input type="email" class="auth-form-input" id="authEmail" required>
+                </div>
+                <div class="auth-form-group">
+                    <label class="auth-form-label">Password</label>
+                    <input type="password" class="auth-form-input" id="authPassword" required>
+                </div>
+                <button type="submit" class="auth-form-submit" id="authSubmit">Login</button>
+                <div class="auth-divider">or</div>
+                <button type="button" class="google-signin-btn" id="googleSignInBtn">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google logo" class="google-icon">
+                    Continue with Google
+                </button>
+                <div class="auth-form-toggle">
+                    <span id="authToggle">Need an account? Register</span>
+                </div>
+                <div class="auth-error" id="authError"></div>
+            </form>
+        </div>
+    </div>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Discover Sri Lanka's Finest Rentals</h1>
+            <p>Find your perfect property or vehicle across the island</p>
+            <div class="search-container">
+                <form class="search-form" id="mainSearchForm">
+                    <input type="text" class="search-input" placeholder="What are you looking for?">
+                    <input type="text" class="search-input" placeholder="Location (Colombo, Kandy, Galle)">
+                    <button type="submit" class="search-btn">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <div class="container">
+        <section id="all-listings" class="fade-in">
+            <h2 class="section-title">Featured Listings</h2>
+            
+            <div class="filters">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label class="filter-label">Type</label>
+                        <select class="filter-select" id="filterType">
+                            <option value="all">All Types</option>
+                            <option value="property">Properties</option>
+                            <option value="car">Vehicles</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Location</label>
+                        <select class="filter-select" id="filterLocation">
+                            <option value="all">All Locations</option>
+                            <option value="colombo">Colombo</option>
+                            <option value="kandy">Kandy</option>
+                            <option value="galle">Galle</option>
+                            <option value="negombo">Negombo</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Price Range</label>
+                        <select class="filter-select" id="filterPrice">
+                            <option value="all">Any Price</option>
+                            <option value="0-10000">Rs.0 - Rs.10,000</option>
+                            <option value="10000-30000">Rs.10,000 - Rs.30,000</option>
+                            <option value="30000+">Rs.30,000+</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="listings-grid" id="allListingsGrid">
+                <!-- Listings will be loaded here -->
+            </div>
+        </section>
+
+        <section id="about" class="fade-in" style="margin-top: 5rem;">
+            <h2 class="section-title">About Renzo</h2>
+            <p style="margin-bottom: 2rem; max-width: 800px; line-height: 1.8;">
+                Renzo is Sri Lanka's premier rental platform, connecting property and vehicle owners with 
+                discerning clients across the island. With our curated selection of high-quality listings 
+                and personalized service, we make finding your perfect rental effortless.
+            </p>
+        </section>
+    </div>
+
+    <a href="create-ad.html" class="create-ad-btn" id="createAdBtn">
+        <i class="fas fa-plus"></i> Create an Ad
+    </a>
+
+    <footer class="fade-in">
+        <div class="footer-content">
+            <div class="footer-column">
+                <h3>Renzo</h3>
+                <p>Sri Lanka's premium rental marketplace, offering the finest properties and vehicles across the island.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-column">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="main.html"><i class="fas fa-chevron-right"></i> Home</a></li>
+                    <li><a href="#all-listings"><i class="fas fa-chevron-right"></i> Listings</a></li>
+                    <li><a href="#about"><i class="fas fa-chevron-right"></i> About</a></li>
+                    <li><a href="create-ad.html"><i class="fas fa-chevron-right"></i> Create Ad</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h3>Popular Locations</h3>
+                <ul>
+                    <li><a href="#"><i class="fas fa-map-marker-alt"></i> Colombo</a></li>
+                    <li><a href="#"><i class="fas fa-map-marker-alt"></i> Kandy</a></li>
+                    <li><a href="#"><i class="fas fa-map-marker-alt"></i> Galle</a></li>
+                    <li><a href="#"><i class="fas fa-map-marker-alt"></i> Negombo</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h3>Contact</h3>
+                <ul>
+                    <li><a href="#"><i class="fas fa-phone"></i> +94 76 123 4567</a></li>
+                    <li><a href="#"><i class="fas fa-envelope"></i> info@renzo.lk</a></li>
+                    <li><a href="#"><i class="fas fa-map-marker-alt"></i> 123 Galle Road, Colombo 03</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="copyright">
+            <p>&copy; 2023 Renzo. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-analytics.js";
+        import { 
+            getAuth, 
+            createUserWithEmailAndPassword, 
+            signInWithEmailAndPassword, 
+            signOut,
+            onAuthStateChanged,
+            GoogleAuthProvider,
+            signInWithPopup
+        } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCtB9nh6t10_awz26kpvam3gD_qyujw4RA",
+  authDomain: "renzo-rentals-14367.firebaseapp.com",
+  projectId: "renzo-rentals-14367",
+  storageBucket: "renzo-rentals-14367.firebasestorage.app",
+  messagingSenderId: "881620871951",
+  appId: "1:881620871951:web:6645d0e8f2b13765bcec7a",
+  measurementId: "G-E0PJRJL8V8"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+
+        // Store the intended destination URL before login
+        let intendedUrl = null;
+
+        // Check if we're coming back from a login redirect
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            intendedUrl = urlParams.get('redirect') || null;
+
+            // If we have an intended URL and the user is logged in, redirect there
+            if (intendedUrl && auth.currentUser) {
+                window.location.href = intendedUrl;
+            }
+        });
+
+        // Auth state management
+        onAuthStateChanged(auth, (user) => {
+            const userProfile = document.getElementById('userProfile');
+            const authButton = document.getElementById('authButton');
+            const createAdBtn = document.getElementById('createAdBtn');
+
+            if (user) {
+                // User is signed in
+                const displayName = user.displayName || user.email.split('@')[0];
+                const photoURL = user.photoURL || `https://ui-avatars.com/api/?name=${displayName.charAt(0).toUpperCase()}&background=337A4B&color=fff`;
+                
+                userProfile.innerHTML = `<img src="${photoURL}" alt="${displayName}">`;
+                authButton.textContent = 'Logout';
+                
+                // Check if we need to redirect after login
+                if (intendedUrl) {
+                    window.location.href = intendedUrl;
+                }
+            } else {
+                // User is signed out
+                userProfile.innerHTML = '<i class="fas fa-user"></i>';
+                authButton.textContent = 'Login';
+            }
+        });
+
+        // Auth modal functionality
+        const authModal = document.getElementById('authModal');
+        const closeAuthModal = document.getElementById('closeAuthModal');
+        const authButton = document.getElementById('authButton');
+        const authForm = document.getElementById('authForm');
+        const authToggle = document.getElementById('authToggle');
+        const authModalTitle = document.getElementById('authModalTitle');
+        const authSubmit = document.getElementById('authSubmit');
+        const authError = document.getElementById('authError');
+        const googleSignInBtn = document.getElementById('googleSignInBtn');
+        const createAdBtn = document.getElementById('createAdBtn');
+
+        let isLogin = true;
+
+        // Toggle between login and register
+        authToggle.addEventListener('click', () => {
+            isLogin = !isLogin;
+            if (isLogin) {
+                authModalTitle.textContent = 'Login';
+                authSubmit.textContent = 'Login';
+                authToggle.textContent = 'Need an account? Register';
+            } else {
+                authModalTitle.textContent = 'Register';
+                authSubmit.textContent = 'Register';
+                authToggle.textContent = 'Already have an account? Login';
+            }
+            authError.style.display = 'none';
+        });
+
+        // Open auth modal
+        authButton.addEventListener('click', () => {
+            if (authButton.textContent === 'Logout') {
+                signOut(auth).then(() => {
+                    // Sign-out successful
+                }).catch((error) => {
+                    console.error(error);
+                });
+            } else {
+                authModal.style.display = 'flex';
+            }
+        });
+
+        // Close auth modal
+        closeAuthModal.addEventListener('click', () => {
+            authModal.style.display = 'none';
+        });
+
+        // Handle auth form submission
+        authForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('authEmail').value;
+            const password = document.getElementById('authPassword').value;
+
+            if (isLogin) {
+                // Login
+                signInWithEmailAndPassword(auth, email, password)
+                    .then(() => {
+                        authModal.style.display = 'none';
+                        authForm.reset();
+                    })
+                    .catch((error) => {
+                        authError.textContent = error.message;
+                        authError.style.display = 'block';
+                    });
+            } else {
+                // Register
+                createUserWithEmailAndPassword(auth, email, password)
+                    .then(() => {
+                        authModal.style.display = 'none';
+                        authForm.reset();
+                    })
+                    .catch((error) => {
+                        authError.textContent = error.message;
+                        authError.style.display = 'block';
+                    });
+            }
+        });
+
+        // Google Sign-In
+        googleSignInBtn.addEventListener('click', () => {
+            signInWithPopup(auth, provider)
+                .then((result) => {
+                    // This gives you a Google Access Token
+                    const credential = GoogleAuthProvider.credentialFromResult(result);
+                    const token = credential.accessToken;
+                    
+                    // The signed-in user info
+                    const user = result.user;
+                    
+                    // Close the modal
+                    authModal.style.display = 'none';
+                })
+                .catch((error) => {
+                    // Handle Errors here
+                    const errorCode = error.code;
+                    const errorMessage = error.message;
+                    const email = error.customData.email;
+                    const credential = GoogleAuthProvider.credentialFromError(error);
+                    
+                    authError.textContent = errorMessage;
+                    authError.style.display = 'block';
+                });
+        });
+
+        // Handle Create Ad button click
+        createAdBtn.addEventListener('click', (e) => {
+            if (!auth.currentUser) {
+                e.preventDefault();
+                // Store the intended destination
+                intendedUrl = 'create-ad.html';
+                // Show login modal
+                authModal.style.display = 'flex';
+            }
+        });
+
+        onAuthStateChanged(auth, (user) => {
+    const userProfile = document.getElementById('userProfile');
+    const authButton = document.getElementById('authButton');
+    const createAdBtn = document.getElementById('createAdBtn');
+    const userProfileLink = document.getElementById('userProfileLink'); // <-- ADD THIS
+
+    if (user) {
+        // User is signed in
+        const displayName = user.displayName || user.email.split('@')[0];
+        const photoURL = user.photoURL || `https://ui-avatars.com/api/?name=${displayName.charAt(0).toUpperCase()}&background=337A4B&color=fff`;
+
+        userProfile.innerHTML = `<img src="${photoURL}" alt="${displayName}">`;
+        authButton.textContent = 'Logout';
+
+        userProfileLink.href = 'user-profile.html'; // <-- ADD THIS LINE
+
+        if (intendedUrl) {
+            window.location.href = intendedUrl;
+        }
+    } else {
+        // User is signed out
+        userProfile.innerHTML = '<i class="fas fa-user"></i>';
+        authButton.textContent = 'Login';
+        userProfileLink.href = '#'; // <-- ADD THIS LINE
+    }
+});
+
+// ADD this event listener to handle clicks on the profile icon when logged out
+document.getElementById('userProfileLink').addEventListener('click', (e) => {
+    if (!auth.currentUser) {
+        e.preventDefault(); // Prevent the link from going anywhere
+        authModal.style.display = 'flex'; // Show the login modal instead
+    }
+});
+    </script>
+
+    <script>
+        // Sample data with Sri Lankan locations
+        const sampleAds = [
+            {
+                id: 1,
+                type: "property",
+                title: "Colombo Luxury Apartment",
+                description: "3BHK apartment with ocean view",
+                location: "Colombo",
+                price: "25000",
+                category: "apartment",
+                bedrooms: "3",
+                image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+                rating: "4.8"
+            },
+            {
+                id: 2,
+                type: "property",
+                title: "Kandy Hillside Villa",
+                description: "4BHK villa with mountain views",
+                location: "Kandy",
+                price: "35000",
+                category: "villa",
+                bedrooms: "4",
+                image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+                rating: "4.9"
+            },
+            {
+                id: 3,
+                type: "car",
+                title: "Toyota Prius Hybrid",
+                description: "2020 Model, fuel efficient",
+                location: "Colombo",
+                price: "5000",
+                category: "sedan",
+                transmission: "automatic",
+                image: "https://images.unsplash.com/photo-1502877338535-766e1452684a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2072&q=80",
+                rating: "4.7"
+            },
+            {
+                id: 4,
+                type: "car",
+                title: "Suzuki Wagon R",
+                description: "Compact and easy to drive",
+                location: "Galle",
+                price: "3500",
+                category: "hatchback",
+                transmission: "manual",
+                image: "https://images.unsplash.com/photo-1555215695-3004980ad54e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+                rating: "4.5"
+            }
+        ];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAllListings();
+            setupEventListeners();
+            setupAnimations();
+        });
+
+        // Function to handle IntersectionObserver for scroll animations
+        function setupAnimations() {
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('appear');
+                        // Stop observing once it has appeared
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                rootMargin: '0px',
+                threshold: 0.1 // Trigger when 10% of the element is visible
+            });
+
+            // Select all elements to animate
+            document.querySelectorAll('.fade-in').forEach(section => {
+                observer.observe(section);
+            });
+            document.querySelectorAll('.listing-card').forEach(card => {
+                observer.observe(card);
+            });
+        }
+
+        function loadAllListings() {
+            const userAds = JSON.parse(localStorage.getItem('rentalAds')) || [];
+            const allAds = [...sampleAds, ...userAds];
+            displayListings(allAds);
+        }
+
+        function displayListings(ads) {
+            const container = document.getElementById('allListingsGrid');
+            container.innerHTML = '';
+            
+            if (ads.length === 0) {
+                container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-secondary); font-size: 1.2rem; margin-top: 2rem;">No listings found matching your criteria.</p>';
+                return;
+            }
+            
+            ads.forEach(ad => {
+                const card = document.createElement('div');
+                card.className = 'listing-card fade-in'; // Add the animation class
+                
+                if (ad.type === 'property') {
+                    card.innerHTML = `
+                        <img src="${ad.image}" alt="${ad.title}" class="listing-img">
+                        <div class="listing-details">
+                            <h3 class="listing-title">${ad.title}</h3>
+                            <p class="listing-location"><i class="fas fa-map-marker-alt"></i> ${ad.location}</p>
+                            <div class="listing-features">
+                                <span><i class="fas fa-bed"></i> ${ad.bedrooms} Beds</span>
+                                <span><i class="fas fa-star"></i> ${ad.rating}</span>
+                            </div>
+                            <div class="listing-price">
+                                Rs.${ad.price} <span>/ month</span>
+                            </div>
+                            <button class="book-btn">Book Now <i class="fas fa-arrow-right"></i></button>
+                        </div>
+                    `;
+                } else {
+                    card.innerHTML = `
+                        <img src="${ad.image}" alt="${ad.title}" class="listing-img">
+                        <div class="listing-details">
+                            <h3 class="listing-title">${ad.title}</h3>
+                            <p class="listing-location"><i class="fas fa-map-marker-alt"></i> ${ad.location}</p>
+                            <div class="listing-features">
+                                <span><i class="fas fa-car"></i> ${ad.category}</span>
+                                <span><i class="fas fa-star"></i> ${ad.rating}</span>
+                            </div>
+                            <div class="listing-price">
+                                Rs.${ad.price} <span>/ day</span>
+                            </div>
+                            <button class="book-btn">Book Now <i class="fas fa-arrow-right"></i></button>
+                        </div>
+                    `;
+                }
+                
+                container.appendChild(card);
+            });
+        }
+
+        function setupEventListeners() {
+            // Filters
+            document.getElementById('filterType').addEventListener('change', filterListings);
+            document.getElementById('filterLocation').addEventListener('change', filterListings);
+            document.getElementById('filterPrice').addEventListener('change', filterListings);
+            
+            // Mobile menu
+            document.querySelector('.mobile-menu-btn').addEventListener('click', function() {
+                document.querySelector('.nav-links').classList.toggle('show');
+            });
+            
+            // Smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+        }
+
+        function filterListings() {
+            const typeFilter = document.getElementById('filterType').value;
+            const locationFilter = document.getElementById('filterLocation').value;
+            const priceFilter = document.getElementById('filterPrice').value;
+            
+            const userAds = JSON.parse(localStorage.getItem('rentalAds')) || [];
+            const allAds = [...sampleAds, ...userAds];
+            
+            const filtered = allAds.filter(ad => {
+                if (typeFilter !== 'all' && ad.type !== typeFilter) return false;
+                if (locationFilter !== 'all' && !ad.location.toLowerCase().includes(locationFilter.toLowerCase())) return false;
+                
+                if (priceFilter !== 'all') {
+                    const price = parseInt(ad.price);
+                    const [min, max] = priceFilter.split('-');
+                    
+                    if (max === '+') {
+                        if (price < parseInt(min)) return false;
+                    } else {
+                        if (price < parseInt(min) || price > parseInt(max)) return false;
+                    }
+                }
+                
+                return true;
+            });
+            
+            displayListings(filtered);
+        }
+    </script>
+</body>
+</html>
